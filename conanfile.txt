@@ -1,0 +1,14 @@
+[build_requires]
+[requires]
+Catch2/2.7.1@catchorg/stable
+OGRE/1.11.6@anotherfoxguy/stable
+
+[generators]
+cmake
+
+[options]
+
+[imports]
+bin, *.dll -> bin
+lib, *.dylib* -> bin
+lib, *.so* -> bin
