@@ -1,7 +1,11 @@
 #include <iostream>
+#include <MainApplication.h>
 
 int main()
 {
-    std::cout << "Hello World!" << std::endl;
+    MainApplication app;
+    app.initApp();
+    app.getRoot()->startRendering();
+    app.closeApp();
     return 0;
 }
