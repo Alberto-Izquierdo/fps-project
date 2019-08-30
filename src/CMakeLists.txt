@@ -7,6 +7,8 @@ add_executable(fps_project
     MainApplication.h
     MainApplication.cpp)
 
+add_subdirectory(audio)
+
 find_package(OGRE REQUIRED)
 include_directories(${OGRE_INCLUDE_DIRS})
 link_directories(${OGRE_LIBRARY_DIRS})

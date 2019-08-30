@@ -2,6 +2,7 @@
 [requires]
 Catch2/2.7.1@catchorg/stable
 OGRE/1.11.6@anotherfoxguy/stable
+ffmpeg/4.2@bincrafters/stable
 
 [generators]
 cmake
