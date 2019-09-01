@@ -7,10 +7,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include_directories(src)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/conan.cmake)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 
-conan_cmake_run(CONANFILE conanfile.txt
-                BASIC_SETUP CMAKE_TARGETS
-                BUILD missing)
+conan_basic_setup(TARGETS)
 
 add_subdirectory(src)
 
