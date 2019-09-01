@@ -8,6 +8,7 @@ addons:
       - python3
       - python3-pip
       - python3-venv
+      - clang-tidy
 
 jobs:
   include:
@@ -31,8 +32,9 @@ jobs:
 # Install conan dependencies, cmake and make
         - mkdir build && cd build
         - conan install .. --build=missing -s compiler.libcxx=libstdc++11
-        - cmake .. -DCMAKE_BUILD_TYPE=Release
+        - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       script:
         - make -j$(nproc)
         - make test
+        - python3 ../run-clang-tidy.py -header-filter='.*' -checks='*'
