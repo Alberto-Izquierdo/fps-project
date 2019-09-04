@@ -1,7 +1,11 @@
 #include "Audio.h"
-#include <libavcodec/avcodec.h>
+extern "C"
+{
 #include <libavutil/mathematics.h>
-#include <filesystem>
+#include <libavutil/frame.h>
+#include <libavutil/mem.h>
+#include <libavcodec/avcodec.h>
+}
 
 #define AUDIO_INBUF_SIZE 20480
 #define AUDIO_REFILL_THRESH 4096
@@ -25,7 +29,7 @@ public:
         }
     }
     T *operator->() const { return m_value; }
-    bool operator!() const { return m_value != nullptr; }
+    bool operator!() const { return m_value == nullptr; }
     T *get() const { return m_value; }
     T *&get() { return m_value; }
 
@@ -62,10 +66,17 @@ static std::optional<std::string> decode(AVCodecContext *dec_ctx, AVPacket *pkt,
             }
         }
     }
+    return {};
 }
 
-std::variant<std::vector<float>, std::string> Audio::getVolumeValuesFromAudioFile(const char *path)
+std::variant<std::vector<float>, std::string> Audio::getVolumeValuesFromAudioFile(const std::string &path)
 {
+    std::hash<std::string> hasher;
+    auto hash = hasher(path);
+    auto searchResult = m_filesAlreadyProcessed.find(hash);
+    if (searchResult != m_filesAlreadyProcessed.end()) {
+        return searchResult->second;
+    }
     AVPacket *pktPtr = av_packet_alloc();
     RAIIContainer pkt(pktPtr, [&]() { av_packet_free(&pktPtr); });
 
@@ -74,7 +85,7 @@ std::variant<std::vector<float>, std::string> Audio::getVolumeValuesFromAudioFil
         return std::string("Codec not found");
     }
 
-    AVCodecParserContext *parserPtr;
+    AVCodecParserContext *parserPtr = av_parser_init(codec->id);;
     RAIIContainer parser(parserPtr, [&]() { av_parser_close(parserPtr); });
     if (!parser) {
         return std::string("Parser not found");
@@ -90,10 +101,16 @@ std::variant<std::vector<float>, std::string> Audio::getVolumeValuesFromAudioFil
         return std::string("Could not open codec");
     }
 
-    FILE *fPtr = fopen(path, "rb");
+    FILE *fPtr = fopen(path.c_str(), "rb");
     RAIIContainer f(fPtr, [&]() { fclose(fPtr); });
     if (!f) {
-        return std::string("Error opening file %s", path);
+        return std::string("Error opening file %s", path.c_str());
+    }
+
+    FILE *ofPtr = fopen(std::to_string(hash).c_str(), "wb");
+    RAIIContainer outfile(ofPtr, [&]() { fclose(ofPtr); });
+    if (!f) {
+        return std::string("Error opening output file %s", std::to_string(hash).c_str());
     }
 
     uint8_t inbuf[AUDIO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
@@ -118,7 +135,7 @@ std::variant<std::vector<float>, std::string> Audio::getVolumeValuesFromAudioFil
         data_size -= ret;
 
         if (pkt->size) {
-            //auto result = decode(c.get(), pkt.get(), decoded_frame.get(), outfile);
+            auto result = decode(c.get(), pkt.get(), decoded_frame.get(), outfile.get());
         }
         if (data_size < AUDIO_REFILL_THRESH) {
             memmove(inbuf, data, data_size);
@@ -128,4 +145,6 @@ std::variant<std::vector<float>, std::string> Audio::getVolumeValuesFromAudioFil
                 data_size += len;
         }
     }
+    std::vector<float> result;
+    return result;
 }

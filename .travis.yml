@@ -48,5 +48,5 @@ jobs:
         - lcov --directory . --capture --output-file coverage.info         # capture coverage info
         - lcov --remove coverage.info '/usr/*' '/home/*/.conan/*' --output-file coverage.info # filter out system
         - lcov --list coverage.info                                        # debug info
-        - valgrind --error-exitcode=42 --leak-check=full ./bin/fps_project ./bin/tst*
+        - valgrind --error-exitcode=42 --leak-check=full ./bin/tst*
         - python3 ../run-clang-tidy.py -header-filter='.*' -checks='*'
