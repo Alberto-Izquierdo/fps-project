@@ -5,7 +5,7 @@
 
 TEST_CASE("Decode file") {
     aiaudio::Audio audioManager;
-    const std::string audioFile("audio.mp3");
+    const std::string audioFile("data/Tchaikovsky_Rococo_Var_orch.mp3");
     audioManager.getVolumeValuesFromAudioFile(audioFile);
     REQUIRE(8 == 4 + 4);
 }

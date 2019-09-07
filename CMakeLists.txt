@@ -15,3 +15,5 @@ add_subdirectory(src)
 
 enable_testing()
 add_subdirectory(test)
+file(COPY data DESTINATION "${CMAKE_BINARY_DIR}/bin")
+file(COPY run_tests.sh DESTINATION "${CMAKE_BINARY_DIR}/bin")
