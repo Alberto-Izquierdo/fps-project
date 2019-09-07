@@ -1,9 +1,7 @@
 [build_requires]
 [requires]
 Catch2/2.7.1@catchorg/stable
-OGRE/1.11.6@anotherfoxguy/stable
 ffmpeg/4.2@bincrafters/stable
-imgui/1.69@bincrafters/stable
 
 [generators]
 cmake
